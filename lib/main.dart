@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:second_day/home.dart';
-import 'package:second_day/second.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,11 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => const Home(),
-        '/second': (context) => const Second(),
-      },
+      home: const Home(),
     );
   }
 }

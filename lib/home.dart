@@ -1,7 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
-import 'package:second_day/second.dart';
+import 'package:http/http.dart' as http;
+import 'package:second_day/album.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -11,24 +12,45 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  Future<Album>? futureAlbum;
+
+  @override
+  void initState() {
+    super.initState();
+    futureAlbum = fetchAlbum();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Screen'),
+        title: const Text('REST API'),
         centerTitle: true,
-        backgroundColor: Colors.red,
+        backgroundColor: Colors.orange,
       ),
       body: Center(
-        child: ElevatedButton(
-          onPressed: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const Second())),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            fixedSize: const Size(100, 100),
-          ),
-          child: const Text('Goto Pg 2'),
-        ),
+        child: FutureBuilder<Album>(
+            future: futureAlbum,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Text(snapshot.data!.title);
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
+              return const CircularProgressIndicator();
+            }),
       ),
     );
+  }
+}
+
+Future<Album> fetchAlbum() async {
+  final response = await http
+      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
+
+  if (response.statusCode == 200) {
+    return Album.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to load album');
   }
 }
