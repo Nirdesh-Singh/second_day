@@ -1,8 +1,6 @@
-import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:second_day/album.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/src/widgets/placeholder.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -12,45 +10,41 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  Future<Album>? futureAlbum;
-
-  @override
-  void initState() {
-    super.initState();
-    futureAlbum = fetchAlbum();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('REST API'),
+        title: const Text('Login'),
         centerTitle: true,
-        backgroundColor: Colors.orange,
+        elevation: 0.0,
+        backgroundColor: Colors.brown,
       ),
-      body: Center(
-        child: FutureBuilder<Album>(
-            future: futureAlbum,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Text(snapshot.data!.title);
-              } else if (snapshot.hasError) {
-                return Text('${snapshot.error}');
-              }
-              return const CircularProgressIndicator();
-            }),
+      body: Container(
+        padding: const EdgeInsets.all(10.0),
+        child: Form(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              TextFormField(
+                decoration: const InputDecoration(
+                    icon: Icon(Icons.email),
+                    hintText: 'email@gmail.com',
+                    fillColor: Colors.grey,
+                    border: OutlineInputBorder()),
+              ),
+              const SizedBox(height: 25),
+              TextFormField(
+                obscureText: true,
+                decoration: const InputDecoration(
+                    icon: Icon(Icons.password),
+                    hintText: 'password1234',
+                    fillColor: Colors.grey,
+                    border: OutlineInputBorder()),
+              ),
+            ],
+          ),
+        ),
       ),
     );
-  }
-}
-
-Future<Album> fetchAlbum() async {
-  final response = await http
-      .get(Uri.parse('https://jsonplaceholder.typicode.com/albums/1'));
-
-  if (response.statusCode == 200) {
-    return Album.fromJson(jsonDecode(response.body));
-  } else {
-    throw Exception('Failed to load album');
   }
 }
